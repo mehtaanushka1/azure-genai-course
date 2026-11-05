@@ -1,0 +1,21 @@
+{
+  "name": "cloud-assistant-evaluation",
+  "evaluators": [
+    "builtin.relevance",
+    "builtin.task_adherence"
+  ],
+  "data": [
+    {
+      "query": "What is Azure Monitor?",
+      "ground_truth": "Azure Monitor collects and analyzes telemetry to monitor applications and infrastructure."
+    },
+    {
+      "query": "What is Azure Key Vault?",
+      "ground_truth": "Azure Key Vault securely stores and manages secrets, keys, and certificates."
+    },
+    {
+      "query": "What is Azure App Service?",
+      "ground_truth": "Azure App Service is a managed platform for hosting web applications and APIs."
+    }
+  ]
+}
