@@ -4,6 +4,14 @@
     "builtin.relevance",
     "builtin.task_adherence"
   ],
+  "evaluator_parameters": {
+  "builtin.relevance": {
+    "deployment_name": "gpt-4.1-mini"
+  },
+  "builtin.task_adherence": {
+    "deployment_name": "gpt-4.1-mini"
+  }
+},
   "data": [
     {
       "query": "What is Azure Monitor?",
