@@ -1,0 +1,19 @@
+{
+  "source": "synthetic_example_not_real_foundry_export",
+  "metric": "relevance",
+  "score_scale": "0_to_5",
+  "results": [
+    {
+      "query": "What is Azure Monitor?",
+      "score": 4.5
+    },
+    {
+      "query": "What is Azure Key Vault?",
+      "score": 4.2
+    },
+    {
+      "query": "What is Azure App Service?",
+      "score": 4.6
+    }
+  ]
+}
