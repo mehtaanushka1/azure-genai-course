@@ -1,0 +1,60 @@
+name: Enterprise Agentic Platform
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  capstone-platform:
+    name: capstone-platform
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: capstone
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/ai-agent-evals
+          ref: v3-beta
+          path: .evaluation-action
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install evaluation dependencies
+        run: python -m pip install ../.evaluation-action
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Validate infrastructure
+        run: az bicep build --file infra/main.bicep --stdout >/dev/null
+      - name: Deploy operational configuration
+        run: >-
+          az deployment group create --resource-group rg-genai-dev-
+          --name capstone-operations-ci --template-file infra/main.bicep
+          --query properties.provisioningState --output tsv
+      - name: Validate security and agent access
+        run: python scripts/validate_platform.py
+      - name: Evaluate Foundry agent
+        env:
+          EVAL_ACTION_PATH: ${{ github.workspace }}/.evaluation-action
+          AZURE_AI_PROJECT_ENDPOINT: ${{ vars.FOUNDRY_PROJECT_ENDPOINT }}
+          DEPLOYMENT_NAME: gpt-4.1-mini
+          AGENT_IDS: agent-it-policy-security:6
+          DATA_PATH: ${{ github.workspace }}/capstone/evaluation/evaluation.json
+        run: python scripts/run_evaluation.py
+      - name: Enforce quality gate
+        run: python scripts/check_gate.py
+      - name: Publish validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capstone-evidence
+          path: capstone/outputs/
+          if-no-files-found: warn

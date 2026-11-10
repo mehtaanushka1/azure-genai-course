@@ -1,0 +1,6 @@
+requests
+| where timestamp > ago(24h)
+| where url contains "/agent/"
+| summarize Requests=count(), Failures=countif(success == false),
+    P95LatencyMs=percentile(duration / 1ms, 95) by bin(timestamp, 5m), resultCode
+| order by timestamp desc
